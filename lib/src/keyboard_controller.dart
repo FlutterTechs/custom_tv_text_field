@@ -155,24 +155,13 @@ class CustomKeyboardState extends State<CustomKeyboard> {
     int nextCol = _selectedCol.value;
 
     if (dRow != 0) {
+      // Vertical movement: clamp column to new row's bounds
       nextCol = nextCol.clamp(0, _currentLayout[nextRow].length - 1);
     } else {
-      nextCol += dCol;
-      if (nextCol < 0) {
-        if (nextRow > 0) {
-          nextRow--;
-          nextCol = _currentLayout[nextRow].length - 1;
-        } else {
-          nextCol = 0;
-        }
-      } else if (nextCol >= _currentLayout[nextRow].length) {
-        if (nextRow < _currentLayout.length - 1) {
-          nextRow++;
-          nextCol = 0;
-        } else {
-          nextCol = _currentLayout[nextRow].length - 1;
-        }
-      }
+      // Horizontal movement: wrap within the same row
+      final int rowLength = _currentLayout[nextRow].length;
+      nextCol = (nextCol + dCol) % rowLength;
+      if (nextCol < 0) nextCol += rowLength;
     }
     _selectedRow.value = nextRow;
     _selectedCol.value = nextCol;
@@ -282,6 +271,11 @@ class CustomKeyboardState extends State<CustomKeyboard> {
                                       selectedRow: _selectedRow,
                                       selectedCol: _selectedCol,
                                       isShifted: _isShifted,
+                                      onKeyTapped: (int row, int col) {
+                                        _selectedRow.value = row;
+                                        _selectedCol.value = col;
+                                        _onAction();
+                                      },
                                     ),
                                   ],
                                 ),
@@ -359,12 +353,14 @@ class _KeyboardGrid extends StatelessWidget {
   final ValueListenable<int> selectedRow;
   final ValueListenable<int> selectedCol;
   final ValueListenable<bool> isShifted;
+  final void Function(int row, int col) onKeyTapped;
 
   const _KeyboardGrid({
     required this.layout,
     required this.selectedRow,
     required this.selectedCol,
     required this.isShifted,
+    required this.onKeyTapped,
   });
 
   double _getKeyWidth(String key, double base) {
@@ -404,6 +400,7 @@ class _KeyboardGrid extends StatelessWidget {
                         margin: EdgeInsets.only(
                           right: c < layout[r].length - 1 ? spacing : 0,
                         ),
+                        onTap: () => onKeyTapped(r, c),
                       ),
                     ),
                   );
@@ -423,6 +420,7 @@ class _KeyboardKey extends StatelessWidget {
   final ValueListenable<bool> isShifted;
   final double width;
   final EdgeInsets margin;
+  final VoidCallback onTap;
 
   const _KeyboardKey({
     required this.label,
@@ -430,27 +428,31 @@ class _KeyboardKey extends StatelessWidget {
     required this.isShifted,
     required this.width,
     required this.margin,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(4);
 
-    return Container(
-      width: width,
-      height: 48,
-      margin: margin,
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.white : Colors.transparent,
-        borderRadius: borderRadius,
-        border: Border.all(
-          color: isSelected
-              ? Colors.white
-              : Colors.white.withValues(alpha: 0.3),
-          width: isSelected ? 2 : 1,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: width,
+        height: 48,
+        margin: margin,
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.transparent,
+          borderRadius: borderRadius,
+          border: Border.all(
+            color: isSelected
+                ? Colors.white
+                : Colors.white.withValues(alpha: 0.3),
+            width: isSelected ? 2 : 1,
+          ),
         ),
+        child: Center(child: _buildContent(context)),
       ),
-      child: Center(child: _buildContent(context)),
     );
   }
 
