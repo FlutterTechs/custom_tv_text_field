@@ -159,7 +159,41 @@ class _TVLoginScreenState extends State<TVLoginScreen> {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 48),
+                      const SizedBox(height: 16),
+                      // Info banner about keyboard support
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Colors.blue.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.keyboard,
+                              color: Colors.blue[300],
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Tip: Use your physical keyboard when the custom keyboard is open!',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.blue[200],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 32),
                       _Field(
                         fieldKey: emailKey,
                         controller: emailController,

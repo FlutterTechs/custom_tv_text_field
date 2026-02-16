@@ -209,6 +209,14 @@ class CustomKeyboardState extends State<CustomKeyboard> {
     if (event is! KeyDownEvent && event is! KeyRepeatEvent)
       return KeyEventResult.ignored;
 
+    // Handle backspace
+    if (event.logicalKey == LogicalKeyboardKey.backspace) {
+      widget.keyboardController.backspace();
+      _scrollToEnd();
+      return KeyEventResult.handled;
+    }
+
+    // Handle navigation and control keys
     final handlers = {
       LogicalKeyboardKey.arrowUp: () => _onMove(-1, 0),
       LogicalKeyboardKey.arrowDown: () => _onMove(1, 0),
@@ -217,15 +225,36 @@ class CustomKeyboardState extends State<CustomKeyboard> {
       LogicalKeyboardKey.enter: _onAction,
       LogicalKeyboardKey.select: _onAction,
       LogicalKeyboardKey.escape: () => widget.keyboardController.hide(false),
-      LogicalKeyboardKey.backspace: () => widget.keyboardController.hide(false),
       LogicalKeyboardKey.exit: () => widget.keyboardController.hide(false),
       LogicalKeyboardKey.goBack: () => widget.keyboardController.hide(false),
     };
 
-    handlers[event.logicalKey]?.call();
-    return handlers.containsKey(event.logicalKey)
-        ? KeyEventResult.handled
-        : KeyEventResult.ignored;
+    if (handlers.containsKey(event.logicalKey)) {
+      handlers[event.logicalKey]?.call();
+      return KeyEventResult.handled;
+    }
+
+    // Handle printable characters using event.character
+    // This captures:
+    // - Lowercase letters (a-z)
+    // - Uppercase letters (A-Z)
+    // - Numbers (0-9)
+    // - Special characters (!, @, #, $, %, etc.)
+    // - Space
+    final character = event.character;
+    if (character != null && character.isNotEmpty) {
+      // Filter out control characters and only accept printable characters
+      final charCode = character.codeUnitAt(0);
+      // Printable ASCII characters range from 32 (space) to 126 (~)
+      // Also allow extended UTF-8 characters (> 127)
+      if ((charCode >= 32 && charCode <= 126) || charCode > 127) {
+        widget.keyboardController.addCharacter(character);
+        _scrollToEnd();
+        return KeyEventResult.handled;
+      }
+    }
+
+    return KeyEventResult.ignored;
   }
 
   @override
