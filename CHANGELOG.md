@@ -1,3 +1,9 @@
+# 1.0.4
+
+- Improved: Added comprehensive dartdoc comments for all public API elements.
+  - Documents classes, constructors, methods, and properties.
+  - Achieved >20% documentation coverage to improve package score.
+
 # 1.0.3
 
 - Improved: Resolved static analysis issues to improve package score.

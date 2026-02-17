@@ -2,18 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 
-/// Enum for keyboard types
-enum KeyboardType { alphabetic, numeric }
+/// Enum for keyboard types: [alphabetic] or [numeric].
+enum KeyboardType {
+  /// standard a-z layout
+  alphabetic,
 
-/// Controller that manages keyboard state and text
+  /// number and symbol layout
+  numeric,
+}
+
+/// Controller that manages keyboard state and text input.
 class KeyboardController extends ChangeNotifier {
   String _text = '';
+
+  /// The current text entered into the controller.
   String get text => _text;
 
   bool _isVisible = false;
+
+  /// Whether the keyboard is currently visible.
   bool get isVisible => _isVisible;
 
+  /// Callback when the text changes.
   Function(String)? onTextChanged;
+
+  /// Callback when the keyboard is closed.
   Function(bool shouldPop)? onKeyboardClosed;
 
   void addCharacter(String character) {
@@ -30,35 +43,41 @@ class KeyboardController extends ChangeNotifier {
     }
   }
 
+  /// Clears all text in the controller.
   void clear() {
     _text = '';
     notifyListeners();
     onTextChanged?.call(_text);
   }
 
+  /// Adds a space character.
   void addSpace() {
     _text += ' ';
     notifyListeners();
     onTextChanged?.call(_text);
   }
 
+  /// Sets the absolute text value.
   void setText(String value) {
     _text = value;
     notifyListeners();
     onTextChanged?.call(_text);
   }
 
+  /// Shows the keyboard.
   void show() {
     _isVisible = true;
     notifyListeners();
   }
 
+  /// Hides the keyboard.
   void hide(bool shouldPop) {
     _isVisible = false;
     notifyListeners();
     onKeyboardClosed?.call(shouldPop);
   }
 
+  /// Toggles keyboard visibility.
   void toggle() => _isVisible ? hide(true) : show();
 }
 
@@ -86,12 +105,21 @@ class KeyboardLayouts {
   ];
 }
 
+/// The custom keyboard widget displayed in the overlay.
 class CustomKeyboard extends StatefulWidget {
+  /// The controller to use for text input.
   final KeyboardController keyboardController;
+
+  /// An optional placeholder to show when text is empty.
   final String? placeholder;
+
+  /// The type of keyboard to display.
   final KeyboardType keyboardType;
+
+  /// The focus node that handles keyboard events.
   final FocusNode focusNode;
 
+  /// Creates a [CustomKeyboard].
   const CustomKeyboard({
     super.key,
     required this.keyboardController,
@@ -104,6 +132,7 @@ class CustomKeyboard extends StatefulWidget {
   State<CustomKeyboard> createState() => CustomKeyboardState();
 }
 
+/// The state of [CustomKeyboard].
 class CustomKeyboardState extends State<CustomKeyboard> {
   final ValueNotifier<int> _selectedRow = ValueNotifier<int>(0);
   final ValueNotifier<int> _selectedCol = ValueNotifier<int>(0);

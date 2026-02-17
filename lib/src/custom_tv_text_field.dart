@@ -1,50 +1,129 @@
 import 'package:flutter/material.dart';
 import 'keyboard_controller.dart';
 
-/// Enum for Text Field Types
+/// Enum for Text Field Types used for automatic validation.
 enum TextFieldType {
+  /// Email validation (checks for @ and .)
   email,
+
+  /// Password validation (minimum length check)
   password,
+
+  /// Phone number validation
   phone,
+
+  /// General numeric validation
   number,
+
+  /// Name validation
   name,
+
+  /// Username validation (disallows spaces)
   username,
+
+  /// URL validation
   url,
+
+  /// Default type for other inputs
   other,
 }
 
-/// Custom TV Text Field with integrated keyboard
+/// Custom TV Text Field with integrated on-screen keyboard support.
+///
+/// Designed specifically for TV platforms to handle D-pad navigation
+/// and remote control input seamlessly.
 class CustomTVTextField extends StatefulWidget {
+  /// The controller that handles the text being edited.
   final TextEditingController controller;
+
+  /// Whether this field is currently focused.
+  ///
+  /// For TV apps, you typically manage this state externally to handle
+  /// focus changes between multiple fields via D-pad navigation.
   final bool isFocused;
+
+  /// Text that is displayed when the field is empty.
   final String hint;
+
+  /// The style to use for the text being edited.
   final TextStyle? textStyle;
+
+  /// The style to use for the [hint].
   final TextStyle? hintStyle;
+
+  /// The decoration to show around the text field.
   final InputDecoration? decoration;
+
+  /// Vertical padding inside the field.
   final double verticalContentPadding;
+
+  /// Horizontal padding inside the field.
   final double horizontalContentPadding;
+
+  /// A widget to display before the text.
   final Widget? prefix;
+
+  /// An icon to display before the text.
   final Widget? prefixIcon;
+
+  /// A widget to display after the text.
   final Widget? suffix;
+
+  /// An icon to display after the text.
   final Widget? suffixIcon;
+
+  /// The background color of the text field.
   final Color? backgroundColor;
+
+  /// The border radius of the text field.
   final double borderRadius;
+
+  /// The color of the border when not focused.
   final Color? borderColor;
+
+  /// The color of the border when focused.
   final Color? focusedBorderColor;
+
+  /// Called when the user submits the text (e.g., clicks 'DONE').
   final ValueChanged<String>? onFieldSubmitted;
+
+  /// The font size of the text.
   final double? fontSize;
+
+  /// The size of the icons (prefix/suffix).
   final double? iconSize;
+
+  /// How the text should be aligned horizontally.
   final TextAlign textAlign;
+
+  /// How the text should be aligned vertically.
   final TextAlignVertical? textAlignVertical;
+
+  /// Called when the keyboard visibility changes.
   final ValueChanged<bool>? onVisibilityChanged;
+
+  /// Whether the text field should be filled with [fillColor].
   final bool filled;
+
+  /// The color to fill the text field with.
   final Color? fillColor;
+
+  /// Custom padding inside the field, overrides [verticalContentPadding] and [horizontalContentPadding].
   final EdgeInsets? contentPadding;
+
+  /// The type of keyboard to display (alphabetic or numeric).
   final KeyboardType keyboardType;
+
+  /// An optional validator function.
   final String? Function(String?)? validator;
+
+  /// Whether this field is required for validation.
   final bool isRequired;
+
+  /// The type of text being edited, affects automatic validation.
   final TextFieldType textFieldType;
 
+  /// Creates a [CustomTVTextField].
   const CustomTVTextField({
     super.key,
     required this.controller,
@@ -82,6 +161,7 @@ class CustomTVTextField extends StatefulWidget {
   State<CustomTVTextField> createState() => CustomTVTextFieldState();
 }
 
+/// The state of [CustomTVTextField].
 class CustomTVTextFieldState extends State<CustomTVTextField>
     with TickerProviderStateMixin {
   late final AnimationController _blinkController;
@@ -91,6 +171,7 @@ class CustomTVTextFieldState extends State<CustomTVTextField>
   final ValueNotifier<String?> _errorText = ValueNotifier<String?>(null);
   final FocusNode _keyboardFocusNode = FocusNode();
 
+  /// Whether the keyboard overlay is currently visible.
   bool get isKeyboardVisible => _keyboardController.isVisible;
 
   bool _validateEmail(String value) {
@@ -135,6 +216,9 @@ class CustomTVTextFieldState extends State<CustomTVTextField>
     return null;
   }
 
+  /// Validates the current text based on [CustomTVTextField.textFieldType] and [CustomTVTextField.validator].
+  ///
+  /// Returns an error string if invalid, or null if valid.
   String? validate() {
     final error = _validateInternal(widget.controller.text);
     _errorText.value = error;
@@ -190,9 +274,11 @@ class CustomTVTextFieldState extends State<CustomTVTextField>
     }
   }
 
+  /// Toggles the keyboard visibility.
   void toggleKeyboard() =>
       _keyboardController.isVisible ? closeKeyboard() : openKeyboard();
 
+  /// Opens the keyboard overlay.
   void openKeyboard() {
     _keyboardController.setText(widget.controller.text);
     _keyboardController.show();
@@ -200,6 +286,7 @@ class CustomTVTextFieldState extends State<CustomTVTextField>
     if (!_isOverlayOpen.value) _showKeyboardOverlay();
   }
 
+  /// Closes the keyboard overlay.
   void closeKeyboard() {
     if (_keyboardController.isVisible) _keyboardController.hide(true);
   }
