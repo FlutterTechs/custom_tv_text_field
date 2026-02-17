@@ -1,3 +1,12 @@
+# 1.0.3
+
+- Improved: Resolved static analysis issues to improve package score.
+  - Fixed `constant_identifier_names` in `TextFieldType`.
+  - Fixed `curly_braces_in_flow_control_structures` in `KeyboardController`.
+  - Removed unnecessary imports.
+  - Cleaned up unused parameters in example app.
+  - Balanced documentation with updated code examples.
+
 # 1.0.2
 
 - **New Feature**: Physical keyboard listening support using modern Flutter API (Focus + onKeyEvent)

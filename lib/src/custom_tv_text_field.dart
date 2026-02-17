@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'keyboard_controller.dart';
 
 /// Enum for Text Field Types
 enum TextFieldType {
-  EMAIL,
-  PASSWORD,
-  PHONE,
-  NUMBER,
-  NAME,
-  USERNAME,
-  URL,
-  OTHER,
+  email,
+  password,
+  phone,
+  number,
+  name,
+  username,
+  url,
+  other,
 }
 
 /// Custom TV Text Field with integrated keyboard
@@ -76,7 +75,7 @@ class CustomTVTextField extends StatefulWidget {
     this.keyboardType = KeyboardType.alphabetic,
     this.validator,
     this.isRequired = false,
-    this.textFieldType = TextFieldType.OTHER,
+    this.textFieldType = TextFieldType.other,
   });
 
   @override
@@ -109,20 +108,20 @@ class CustomTVTextFieldState extends State<CustomTVTextField>
 
     if (text.isNotEmpty) {
       switch (widget.textFieldType) {
-        case TextFieldType.EMAIL:
+        case TextFieldType.email:
           if (!_validateEmail(text)) return "Email is invalid";
           break;
-        case TextFieldType.PASSWORD:
+        case TextFieldType.password:
           if (text.length < 6) return "Minimum password length should be 6";
           break;
-        case TextFieldType.PHONE:
-        case TextFieldType.NUMBER:
+        case TextFieldType.phone:
+        case TextFieldType.number:
           if (double.tryParse(text) == null) return "Invalid number";
           break;
-        case TextFieldType.URL:
+        case TextFieldType.url:
           if (!Uri.tryParse(text)!.hasAbsolutePath) return "Invalid URL";
           break;
-        case TextFieldType.USERNAME:
+        case TextFieldType.username:
           if (text.contains(' ')) return "Username should not contain space";
           break;
         default:

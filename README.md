@@ -30,7 +30,7 @@ import 'package:custom_tv_text_field/custom_tv_text_field.dart';
 CustomTVTextField(
   controller: myController,
   hint: 'Enter your email',
-  textFieldType: TextFieldType.EMAIL,
+  textFieldType: TextFieldType.email,
   isRequired: true,
   isFocused: true, // Handle focus state for TV navigation
 )
@@ -40,11 +40,11 @@ CustomTVTextField(
 
 The package supports automated validation through `TextFieldType`:
 
-- `TextFieldType.EMAIL`: Validates email patterns.
-- `TextFieldType.PASSWORD`: Minimum length of 6 characters.
-- `TextFieldType.PHONE` / `TextFieldType.NUMBER`: Numeric validation.
-- `TextFieldType.USERNAME`: Space-free strings.
-- `TextFieldType.URL`: Valid absolute URIs.
+- `TextFieldType.email`: Validates email patterns.
+- `TextFieldType.password`: Minimum length of 6 characters.
+- `TextFieldType.phone` / `TextFieldType.number`: Numeric validation.
+- `TextFieldType.username`: Space-free strings.
+- `TextFieldType.url`: Valid absolute URIs.
 
 ## Focus Management
 

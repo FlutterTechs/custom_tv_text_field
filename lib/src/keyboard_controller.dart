@@ -112,8 +112,9 @@ class CustomKeyboardState extends State<CustomKeyboard> {
   final ScrollController _scrollController = ScrollController();
 
   List<List<String>> get _currentLayout {
-    if (_activeType.value == KeyboardType.numeric)
+    if (_activeType.value == KeyboardType.numeric) {
       return KeyboardLayouts.numeric;
+    }
     return _isShifted.value
         ? KeyboardLayouts.alphabeticUpper
         : KeyboardLayouts.alphabeticLower;
@@ -206,8 +207,9 @@ class CustomKeyboardState extends State<CustomKeyboard> {
   }
 
   KeyEventResult _handleKey(KeyEvent event) {
-    if (event is! KeyDownEvent && event is! KeyRepeatEvent)
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
       return KeyEventResult.ignored;
+    }
 
     // Handle backspace
     if (event.logicalKey == LogicalKeyboardKey.backspace) {
@@ -262,8 +264,9 @@ class CustomKeyboardState extends State<CustomKeyboard> {
     return ListenableBuilder(
       listenable: widget.keyboardController,
       builder: (context, _) {
-        if (!widget.keyboardController.isVisible)
+        if (!widget.keyboardController.isVisible) {
           return const SizedBox.shrink();
+        }
 
         return SizedBox.expand(
           child: GestureDetector(

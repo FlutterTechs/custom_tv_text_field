@@ -202,7 +202,7 @@ class _TVLoginScreenState extends State<TVLoginScreen> {
                         isSelected:
                             section == LoginSection.email && !hasKeyboardOpen,
                         isRequired: true,
-                        textFieldType: TextFieldType.EMAIL,
+                        textFieldType: TextFieldType.email,
                         onVisibilityChanged: (v) => _hasKeyboardOpen.value = v,
                       ),
                       const SizedBox(height: 16),
@@ -215,7 +215,7 @@ class _TVLoginScreenState extends State<TVLoginScreen> {
                             section == LoginSection.password &&
                             !hasKeyboardOpen,
                         isRequired: true,
-                        textFieldType: TextFieldType.PASSWORD,
+                        textFieldType: TextFieldType.password,
                         onVisibilityChanged: (v) => _hasKeyboardOpen.value = v,
                       ),
                       const SizedBox(height: 16),
@@ -227,7 +227,7 @@ class _TVLoginScreenState extends State<TVLoginScreen> {
                         isSelected:
                             section == LoginSection.phone && !hasKeyboardOpen,
                         isRequired: false,
-                        textFieldType: TextFieldType.PHONE,
+                        textFieldType: TextFieldType.phone,
                         keyboardType: KeyboardType.numeric,
                         onVisibilityChanged: (v) => _hasKeyboardOpen.value = v,
                       ),
@@ -257,9 +257,7 @@ class _Field extends StatelessWidget {
   final IconData icon;
   final bool isSelected;
   final ValueChanged<bool> onVisibilityChanged;
-  final VoidCallback? onSubmitted;
   final KeyboardType keyboardType;
-  final String? Function(String?)? validator;
   final bool isRequired;
   final TextFieldType textFieldType;
 
@@ -270,11 +268,9 @@ class _Field extends StatelessWidget {
     required this.icon,
     required this.isSelected,
     required this.onVisibilityChanged,
-    this.onSubmitted,
     this.keyboardType = KeyboardType.alphabetic,
-    this.validator,
     this.isRequired = false,
-    this.textFieldType = TextFieldType.OTHER,
+    this.textFieldType = TextFieldType.other,
   });
 
   @override
@@ -286,13 +282,12 @@ class _Field extends StatelessWidget {
       prefixIcon: Icon(icon, color: Colors.white70),
       isFocused: isSelected,
       onVisibilityChanged: onVisibilityChanged,
-      onFieldSubmitted: onSubmitted != null ? (_) => onSubmitted!() : null,
+      onFieldSubmitted: (_) {}, // Removed unused onSubmitted parameter
       keyboardType: keyboardType,
       backgroundColor: Colors.grey[900],
       focusedBorderColor: Colors.white,
       borderRadius: 4,
-      validator: validator,
-      isRequired: isRequired,
+      isRequired: isRequired, // Removed unused validator parameter
       textFieldType: textFieldType,
     );
   }

@@ -34,8 +34,9 @@ This Flutter implementation provides modern keyboard key listening capabilities 
 ```dart
 KeyEventResult _handleKey(KeyEvent event) {
   // Only handle key down and repeat events
-  if (event is! KeyDownEvent && event is! KeyRepeatEvent)
+  if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
     return KeyEventResult.ignored;
+  }
 
   // Handle backspace separately
   if (event.logicalKey == LogicalKeyboardKey.backspace) {

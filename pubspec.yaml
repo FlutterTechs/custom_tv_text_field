@@ -1,6 +1,6 @@
 name: custom_tv_text_field
 description: A premium, TV-optimized custom text field and keyboard for Flutter applications. Support for remote control navigation, automated validation, and smooth animations.
-version: 1.0.2
+version: 1.0.3
 homepage: https://github.com/FlutterTechs/custom_tv_text_field
 repository: https://github.com/FlutterTechs/custom_tv_text_field
 issue_tracker: https://github.com/FlutterTechs/custom_tv_text_field/issues
