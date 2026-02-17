@@ -1,3 +1,19 @@
+# 1.0.7
+
+- **Correction**: Updated README and platform support details. 
+- Removed Apple TV from supported platforms.
+- Added specific support for Xiaomi TV, Philips TV, and Tizen OS.
+
+# 1.0.6
+
+- **SEO**: Optimized README and pubspec for better search ranking (Android TV, Remote Control, D-Pad keywords).
+- **Documentation**: Enhanced README structure and platform support details.
+
+# 1.0.5
+
+- **Visual**: Added GIF preview to README for better presentation.
+- Included assets in package.
+
 # 1.0.4
 
 - Improved: Added comprehensive dartdoc comments for all public API elements.
