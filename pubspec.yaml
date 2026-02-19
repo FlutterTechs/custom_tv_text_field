@@ -1,6 +1,6 @@
 name: custom_tv_text_field
 description: A premium Flutter custom text field and on-screen keyboard for Android TV, Xiaomi TV, Philips TV, Tizen OS, and Fire TV Stick. Optimized for remote control D-pad navigation.
-version: 1.0.7
+version: 1.0.8
 homepage: https://github.com/FlutterTechs/custom_tv_text_field
 repository: https://github.com/FlutterTechs/custom_tv_text_field
 issue_tracker: https://github.com/FlutterTechs/custom_tv_text_field/issues

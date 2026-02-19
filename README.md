@@ -1,7 +1,7 @@
 # Custom TV Text Field 📺
 
 <p align="center">
-  <img src="assets/keyboard_preview.gif" width="600" alt="Android TV Flutter Custom Text Field and Keyboard Preview" />
+  <img src="https://raw.githubusercontent.com/FlutterTechs/custom_tv_text_field/master/assets/keyboard_preview.gif" width="600" alt="Android TV Flutter Custom Text Field and Keyboard Preview" />
 </p>
 
 ### The Ultimate Flutter Text Input Solution for Android TV, and Smart TV Platforms.

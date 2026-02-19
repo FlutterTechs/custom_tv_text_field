@@ -1,3 +1,7 @@
+# 1.0.8
+
+- **Fix**: Updated GIF preview link to use absolute URL for better visibility on pub.dev.
+
 # 1.0.7
 
 - **Correction**: Updated README and platform support details. 
