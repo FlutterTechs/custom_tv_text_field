@@ -6,7 +6,7 @@ repository: https://github.com/FlutterTechs/custom_tv_text_field
 issue_tracker: https://github.com/FlutterTechs/custom_tv_text_field/issues
 
 environment:
-  sdk: '>=3.10.3 <4.0.0'
+  sdk: '>=3.1.2 <4.0.0'
   flutter: '>=3.0.0'
 
 dependencies:

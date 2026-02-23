@@ -167,10 +167,10 @@ class _TVLoginScreenState extends State<TVLoginScreen> {
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withValues(alpha: 0.1),
+                          color: Colors.blue.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: Colors.blue.withValues(alpha: 0.3),
+                            color: Colors.blue.withOpacity(0.3),
                           ),
                         ),
                         child: Row(
@@ -305,9 +305,7 @@ class _LoginButton extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       height: 52,
       decoration: BoxDecoration(
-        color: isSelected
-            ? Colors.deepPurpleAccent
-            : Colors.deepPurple.withValues(alpha: 0.3),
+        color: isSelected ? Colors.deepPurpleAccent : Colors.deepPurple.withOpacity(0.3),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
           color: isSelected ? Colors.white : Colors.transparent,

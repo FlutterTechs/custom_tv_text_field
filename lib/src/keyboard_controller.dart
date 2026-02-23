@@ -301,7 +301,7 @@ class CustomKeyboardState extends State<CustomKeyboard> {
           child: GestureDetector(
             onTap: () => widget.keyboardController.hide(true),
             child: Container(
-              color: Colors.black.withValues(alpha: 0.85),
+              color: Colors.black.withOpacity(0.85),
               child: SafeArea(
                 child: Center(
                   child: GestureDetector(
@@ -385,7 +385,7 @@ class _PreviewField extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.transparent,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+        border: Border.all(color: Colors.white.withOpacity(0.3)),
       ),
       child: SingleChildScrollView(
         controller: scrollController,
@@ -395,9 +395,7 @@ class _PreviewField extends StatelessWidget {
           child: Text(
             isEmpty ? placeholder : text,
             style: TextStyle(
-              color: isEmpty
-                  ? Colors.white.withValues(alpha: 0.5)
-                  : Colors.white,
+              color: isEmpty ? Colors.white.withOpacity(0.5) : Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.w600,
               fontFamily: 'monospace',
@@ -506,9 +504,7 @@ class _KeyboardKey extends StatelessWidget {
           color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: borderRadius,
           border: Border.all(
-            color: isSelected
-                ? Colors.white
-                : Colors.white.withValues(alpha: 0.3),
+            color: isSelected ? Colors.white : Colors.white.withOpacity(0.3),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -542,7 +538,7 @@ class _KeyboardKey extends StatelessWidget {
           width: width * 0.5,
           height: 4,
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.5),
+            color: color.withOpacity(0.5),
             borderRadius: BorderRadius.circular(2),
           ),
         );

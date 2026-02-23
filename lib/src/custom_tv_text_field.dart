@@ -300,7 +300,7 @@ class CustomTVTextFieldState extends State<CustomTVTextField>
     showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withValues(alpha: 0.01),
+      barrierColor: Colors.black.withOpacity(0.01),
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: EdgeInsets.zero,
