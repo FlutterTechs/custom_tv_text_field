@@ -133,11 +133,14 @@ class CustomKeyboard extends StatefulWidget {
 }
 
 /// The state of [CustomKeyboard].
-class CustomKeyboardState extends State<CustomKeyboard> {
+class CustomKeyboardState extends State<CustomKeyboard>
+    with TickerProviderStateMixin {
   final ValueNotifier<int> _selectedRow = ValueNotifier<int>(0);
   final ValueNotifier<int> _selectedCol = ValueNotifier<int>(0);
   final ValueNotifier<bool> _isShifted = ValueNotifier<bool>(false);
   late final ValueNotifier<KeyboardType> _activeType;
+  late final AnimationController _blinkController;
+  late final Animation<double> _blinkAnimation;
   final ScrollController _scrollController = ScrollController();
 
   List<List<String>> get _currentLayout {
@@ -153,6 +156,21 @@ class CustomKeyboardState extends State<CustomKeyboard> {
   void initState() {
     super.initState();
     _activeType = ValueNotifier<KeyboardType>(widget.keyboardType);
+    _blinkController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _blinkAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_blinkController);
+    _blinkController.repeat(reverse: true);
+    widget.keyboardController.addListener(_onControllerChanged);
+    _scrollToEnd();
+  }
+
+  void _onControllerChanged() {
+    _scrollToEnd();
   }
 
   @override
@@ -222,17 +240,18 @@ class CustomKeyboardState extends State<CustomKeyboard> {
         controller.addCharacter(key);
         break;
     }
-    _scrollToEnd();
   }
 
   void _scrollToEnd() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-      );
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   KeyEventResult _handleKey(KeyEvent event) {
@@ -243,7 +262,6 @@ class CustomKeyboardState extends State<CustomKeyboard> {
     // Handle backspace
     if (event.logicalKey == LogicalKeyboardKey.backspace) {
       widget.keyboardController.backspace();
-      _scrollToEnd();
       return KeyEventResult.handled;
     }
 
@@ -280,7 +298,6 @@ class CustomKeyboardState extends State<CustomKeyboard> {
       // Also allow extended UTF-8 characters (> 127)
       if ((charCode >= 32 && charCode <= 126) || charCode > 127) {
         widget.keyboardController.addCharacter(character);
-        _scrollToEnd();
         return KeyEventResult.handled;
       }
     }
@@ -303,44 +320,50 @@ class CustomKeyboardState extends State<CustomKeyboard> {
             child: Container(
               color: Colors.black.withValues(alpha: 0.85),
               child: SafeArea(
-                child: Center(
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 800),
-                      child: Focus(
-                        focusNode: widget.focusNode,
-                        onKeyEvent: (_, e) => _handleKey(e),
-                        autofocus: true,
-                        child: ValueListenableBuilder<KeyboardType>(
-                          valueListenable: _activeType,
-                          builder: (context, type, _) =>
-                              ValueListenableBuilder<bool>(
-                                valueListenable: _isShifted,
-                                builder: (context, shifted, _) => Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    _PreviewField(
-                                      text: widget.keyboardController.text,
-                                      placeholder:
-                                          widget.placeholder ?? 'Enter text...',
-                                      scrollController: _scrollController,
-                                    ),
-                                    const SizedBox(height: 24),
-                                    _KeyboardGrid(
-                                      layout: _currentLayout,
-                                      selectedRow: _selectedRow,
-                                      selectedCol: _selectedCol,
-                                      isShifted: _isShifted,
-                                      onKeyTapped: (int row, int col) {
-                                        _selectedRow.value = row;
-                                        _selectedCol.value = col;
-                                        _onAction();
-                                      },
-                                    ),
-                                  ],
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 32.0),
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 800),
+                        child: Focus(
+                          focusNode: widget.focusNode,
+                          onKeyEvent: (_, e) => _handleKey(e),
+                          autofocus: true,
+                          child: ValueListenableBuilder<KeyboardType>(
+                            valueListenable: _activeType,
+                            builder: (context, type, _) =>
+                                ValueListenableBuilder<bool>(
+                                  valueListenable: _isShifted,
+                                  builder: (context, shifted, _) => Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _PreviewField(
+                                        text: widget.keyboardController.text,
+                                        placeholder:
+                                            widget.placeholder ??
+                                            'Enter text...',
+                                        scrollController: _scrollController,
+                                        cursorAnimation: _blinkAnimation,
+                                      ),
+                                      const SizedBox(height: 24),
+                                      _KeyboardGrid(
+                                        layout: _currentLayout,
+                                        selectedRow: _selectedRow,
+                                        selectedCol: _selectedCol,
+                                        isShifted: _isShifted,
+                                        onKeyTapped: (int row, int col) {
+                                          _selectedRow.value = row;
+                                          _selectedCol.value = col;
+                                          _onAction();
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
+                          ),
                         ),
                       ),
                     ),
@@ -356,11 +379,13 @@ class CustomKeyboardState extends State<CustomKeyboard> {
 
   @override
   void dispose() {
+    widget.keyboardController.removeListener(_onControllerChanged);
     _selectedRow.dispose();
     _selectedCol.dispose();
     _isShifted.dispose();
     _activeType.dispose();
     _scrollController.dispose();
+    _blinkController.dispose();
     super.dispose();
   }
 }
@@ -369,16 +394,19 @@ class _PreviewField extends StatelessWidget {
   final String text;
   final String placeholder;
   final ScrollController scrollController;
+  final Animation<double> cursorAnimation;
 
   const _PreviewField({
     required this.text,
     required this.placeholder,
     required this.scrollController,
+    required this.cursorAnimation,
   });
 
   @override
   Widget build(BuildContext context) {
     final isEmpty = text.isEmpty;
+
     return Container(
       height: 44,
       width: 400,
@@ -390,19 +418,56 @@ class _PreviewField extends StatelessWidget {
       child: SingleChildScrollView(
         controller: scrollController,
         scrollDirection: Axis.horizontal,
-        child: Align(
+        child: Container(
           alignment: Alignment.centerLeft,
-          child: Text(
-            isEmpty ? placeholder : text,
-            style: TextStyle(
-              color: isEmpty
-                  ? Colors.white.withValues(alpha: 0.5)
-                  : Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'monospace',
+          padding: const EdgeInsets.only(right: 24),
+          child: SelectionArea(
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: isEmpty ? placeholder : text,
+                    style: TextStyle(
+                      color: isEmpty
+                          ? Colors.white.withValues(alpha: 0.5)
+                          : Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: _PreviewCursor(animation: cursorAnimation),
+                  ),
+                ],
+              ),
+              maxLines: 1,
+              softWrap: false,
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PreviewCursor extends StatelessWidget {
+  final Animation<double> animation;
+
+  const _PreviewCursor({required this.animation});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, _) => Opacity(
+        opacity: animation.value,
+        child: Container(
+          width: 2,
+          height: 22,
+          margin: const EdgeInsets.only(left: 2),
+          color: Colors.white,
         ),
       ),
     );
@@ -537,6 +602,8 @@ class _KeyboardKey extends StatelessWidget {
             size: 22,
           ),
         );
+      case 'PASTE':
+        return Icon(Icons.content_paste, color: color, size: 20);
       case 'SPACE':
         return Container(
           width: width * 0.5,

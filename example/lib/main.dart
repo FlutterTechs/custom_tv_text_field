@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-enum LoginSection { email, password, phone, loginButton }
+enum LoginSection { email, password, phone, bio, loginButton }
 
 class TVLoginScreen extends StatefulWidget {
   const TVLoginScreen({super.key});
@@ -47,12 +47,15 @@ class _TVLoginScreenState extends State<TVLoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  final TextEditingController bioController = TextEditingController();
 
   final GlobalKey<CustomTVTextFieldState> emailKey =
       GlobalKey<CustomTVTextFieldState>();
   final GlobalKey<CustomTVTextFieldState> passwordKey =
       GlobalKey<CustomTVTextFieldState>();
   final GlobalKey<CustomTVTextFieldState> phoneKey =
+      GlobalKey<CustomTVTextFieldState>();
+  final GlobalKey<CustomTVTextFieldState> bioKey =
       GlobalKey<CustomTVTextFieldState>();
 
   @override
@@ -67,6 +70,7 @@ class _TVLoginScreenState extends State<TVLoginScreen> {
     emailController.dispose();
     passwordController.dispose();
     phoneController.dispose();
+    bioController.dispose();
     _currentSection.dispose();
     _hasKeyboardOpen.dispose();
     super.dispose();
@@ -114,6 +118,9 @@ class _TVLoginScreenState extends State<TVLoginScreen> {
       case LoginSection.phone:
         phoneKey.currentState?.toggleKeyboard();
         break;
+      case LoginSection.bio:
+        bioKey.currentState?.toggleKeyboard();
+        break;
       case LoginSection.loginButton:
         _submitLogin();
         break;
@@ -147,98 +154,116 @@ class _TVLoginScreenState extends State<TVLoginScreen> {
                 valueListenable: _currentSection,
                 builder: (context, section, _) => ValueListenableBuilder<bool>(
                   valueListenable: _hasKeyboardOpen,
-                  builder: (context, hasKeyboardOpen, _) => Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Text(
-                        'TV Login',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      // Info banner about keyboard support
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Colors.blue.withValues(alpha: 0.3),
+                  builder: (context, hasKeyboardOpen, _) => SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Text(
+                          'TV Login',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
                           ),
+                          textAlign: TextAlign.center,
                         ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.keyboard,
-                              color: Colors.blue[300],
-                              size: 20,
+                        const SizedBox(height: 16),
+                        // Info banner about keyboard support
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Colors.blue.withValues(alpha: 0.3),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                'Tip: Use your physical keyboard when the custom keyboard is open!',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.blue[200],
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.keyboard,
+                                color: Colors.blue[300],
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'Tip: Use your physical keyboard when the custom keyboard is open!',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.blue[200],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 32),
-                      _Field(
-                        fieldKey: emailKey,
-                        controller: emailController,
-                        label: "Email",
-                        icon: Icons.email,
-                        isSelected:
-                            section == LoginSection.email && !hasKeyboardOpen,
-                        isRequired: true,
-                        textFieldType: TextFieldType.email,
-                        onVisibilityChanged: (v) => _hasKeyboardOpen.value = v,
-                      ),
-                      const SizedBox(height: 16),
-                      _Field(
-                        fieldKey: passwordKey,
-                        controller: passwordController,
-                        label: "Password",
-                        icon: Icons.lock,
-                        isSelected:
-                            section == LoginSection.password &&
-                            !hasKeyboardOpen,
-                        isRequired: true,
-                        textFieldType: TextFieldType.password,
-                        onVisibilityChanged: (v) => _hasKeyboardOpen.value = v,
-                      ),
-                      const SizedBox(height: 16),
-                      _Field(
-                        fieldKey: phoneKey,
-                        controller: phoneController,
-                        label: "Phone",
-                        icon: Icons.phone,
-                        isSelected:
-                            section == LoginSection.phone && !hasKeyboardOpen,
-                        isRequired: false,
-                        textFieldType: TextFieldType.phone,
-                        keyboardType: KeyboardType.numeric,
-                        onVisibilityChanged: (v) => _hasKeyboardOpen.value = v,
-                      ),
-                      const SizedBox(height: 32),
-                      _LoginButton(
-                        isSelected:
-                            section == LoginSection.loginButton &&
-                            !hasKeyboardOpen,
-                        onTap: _submitLogin,
-                      ),
-                    ],
+                        const SizedBox(height: 32),
+                        _Field(
+                          fieldKey: emailKey,
+                          controller: emailController,
+                          label: "Email",
+                          icon: Icons.email,
+                          isSelected:
+                              section == LoginSection.email && !hasKeyboardOpen,
+                          isRequired: true,
+                          textFieldType: TextFieldType.email,
+                          onVisibilityChanged: (v) =>
+                              _hasKeyboardOpen.value = v,
+                        ),
+                        const SizedBox(height: 16),
+                        _Field(
+                          fieldKey: passwordKey,
+                          controller: passwordController,
+                          label: "Password",
+                          icon: Icons.lock,
+                          isSelected:
+                              section == LoginSection.password &&
+                              !hasKeyboardOpen,
+                          isRequired: true,
+                          textFieldType: TextFieldType.password,
+                          onVisibilityChanged: (v) =>
+                              _hasKeyboardOpen.value = v,
+                        ),
+                        const SizedBox(height: 16),
+                        _Field(
+                          fieldKey: phoneKey,
+                          controller: phoneController,
+                          label: "Phone",
+                          icon: Icons.phone,
+                          isSelected:
+                              section == LoginSection.phone && !hasKeyboardOpen,
+                          isRequired: false,
+                          textFieldType: TextFieldType.phone,
+                          keyboardType: KeyboardType.numeric,
+                          onVisibilityChanged: (v) =>
+                              _hasKeyboardOpen.value = v,
+                        ),
+                        const SizedBox(height: 16),
+                        _Field(
+                          fieldKey: bioKey,
+                          controller: bioController,
+                          label: "Bio (Optional Multi-line)",
+                          icon: Icons.person_outline,
+                          isSelected:
+                              section == LoginSection.bio && !hasKeyboardOpen,
+                          isRequired: false,
+                          maxLines: 3,
+                          onVisibilityChanged: (v) =>
+                              _hasKeyboardOpen.value = v,
+                        ),
+                        const SizedBox(height: 32),
+                        _LoginButton(
+                          isSelected:
+                              section == LoginSection.loginButton &&
+                              !hasKeyboardOpen,
+                          onTap: _submitLogin,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -260,6 +285,7 @@ class _Field extends StatelessWidget {
   final KeyboardType keyboardType;
   final bool isRequired;
   final TextFieldType textFieldType;
+  final int maxLines;
 
   const _Field({
     required this.fieldKey,
@@ -271,6 +297,7 @@ class _Field extends StatelessWidget {
     this.keyboardType = KeyboardType.alphabetic,
     this.isRequired = false,
     this.textFieldType = TextFieldType.other,
+    this.maxLines = 1,
   });
 
   @override
@@ -289,6 +316,7 @@ class _Field extends StatelessWidget {
       borderRadius: 4,
       isRequired: isRequired, // Removed unused validator parameter
       textFieldType: textFieldType,
+      maxLines: maxLines,
     );
   }
 }

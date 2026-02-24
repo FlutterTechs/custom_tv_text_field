@@ -123,6 +123,9 @@ class CustomTVTextField extends StatefulWidget {
   /// The type of text being edited, affects automatic validation.
   final TextFieldType textFieldType;
 
+  /// The maximum number of lines for the text field.
+  final int maxLines;
+
   /// Creates a [CustomTVTextField].
   const CustomTVTextField({
     super.key,
@@ -155,6 +158,7 @@ class CustomTVTextField extends StatefulWidget {
     this.validator,
     this.isRequired = false,
     this.textFieldType = TextFieldType.other,
+    this.maxLines = 1,
   });
 
   @override
@@ -167,6 +171,7 @@ class CustomTVTextFieldState extends State<CustomTVTextField>
   late final AnimationController _blinkController;
   late final Animation<double> _blinkAnimation;
   late final KeyboardController _keyboardController;
+  late final ScrollController _scrollController;
   final ValueNotifier<bool> _isOverlayOpen = ValueNotifier<bool>(false);
   final ValueNotifier<String?> _errorText = ValueNotifier<String?>(null);
   final FocusNode _keyboardFocusNode = FocusNode();
@@ -228,8 +233,26 @@ class CustomTVTextFieldState extends State<CustomTVTextField>
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     _initController();
     _initAnimation();
+    widget.controller.addListener(_onTextChanged);
+  }
+
+  void _onTextChanged() {
+    _scrollToEnd();
+  }
+
+  void _scrollToEnd() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   void _initController() {
@@ -268,9 +291,12 @@ class CustomTVTextFieldState extends State<CustomTVTextField>
   void didUpdateWidget(CustomTVTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.isFocused != oldWidget.isFocused) {
-      widget.isFocused
-          ? _blinkController.repeat(reverse: true)
-          : _blinkController.stop();
+      if (widget.isFocused) {
+        _blinkController.repeat(reverse: true);
+        _scrollToEnd();
+      } else {
+        _blinkController.stop();
+      }
     }
   }
 
@@ -316,8 +342,10 @@ class CustomTVTextFieldState extends State<CustomTVTextField>
 
   @override
   void dispose() {
+    widget.controller.removeListener(_onTextChanged);
     _keyboardController.removeListener(_onKeyboardStateChanged);
     _keyboardController.dispose();
+    _scrollController.dispose();
     _isOverlayOpen.dispose();
     _errorText.dispose();
     _blinkController.dispose();
@@ -348,6 +376,7 @@ class CustomTVTextFieldState extends State<CustomTVTextField>
                       widget: widget,
                       blinkAnimation: _blinkAnimation,
                       hasError: error != null,
+                      scrollController: _scrollController,
                     ),
                   ),
                 ],
@@ -406,10 +435,12 @@ class _FieldDisplay extends StatelessWidget {
   final CustomTVTextField widget;
   final Animation<double> blinkAnimation;
   final bool hasError;
+  final ScrollController scrollController;
 
   const _FieldDisplay({
     required this.widget,
     required this.blinkAnimation,
+    required this.scrollController,
     this.hasError = false,
   });
 
@@ -458,6 +489,7 @@ class _FieldDisplay extends StatelessWidget {
       decoration: _buildDecoration(context),
       padding: _getPadding(),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (widget.prefixIcon != null) ...[
             IconTheme(
@@ -471,20 +503,47 @@ class _FieldDisplay extends StatelessWidget {
               valueListenable: widget.controller,
               builder: (context, value, _) {
                 final isEmpty = value.text.isEmpty;
-                return Row(
+
+                final textSpan = TextSpan(
                   children: [
-                    Text(
-                      isEmpty ? widget.hint : value.text,
+                    TextSpan(
+                      text: isEmpty ? widget.hint : value.text,
                       style: isEmpty ? hintStyle : textStyle,
-                      textAlign: widget.textAlign,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    if (widget.isFocused)
-                      _Cursor(
-                        animation: blinkAnimation,
-                        height: fontSize * 1.2,
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: Visibility(
+                        visible: widget.isFocused,
+                        maintainSize: true,
+                        maintainAnimation: true,
+                        maintainState: true,
+                        child: _Cursor(
+                          key: const ValueKey('field_cursor'),
+                          animation: blinkAnimation,
+                          height: fontSize * 1.1,
+                        ),
                       ),
+                    ),
                   ],
+                );
+
+                if (widget.maxLines > 1) {
+                  return Text.rich(
+                    textSpan,
+                    textAlign: widget.textAlign,
+                    maxLines: widget.maxLines,
+                    overflow: TextOverflow.visible,
+                  );
+                }
+
+                return SingleChildScrollView(
+                  controller: scrollController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 24),
+                    child: Text.rich(textSpan, maxLines: 1, softWrap: false),
+                  ),
                 );
               },
             ),
@@ -506,7 +565,7 @@ class _Cursor extends StatelessWidget {
   final Animation<double> animation;
   final double height;
 
-  const _Cursor({required this.animation, required this.height});
+  const _Cursor({super.key, required this.animation, required this.height});
 
   @override
   Widget build(BuildContext context) {

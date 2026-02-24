@@ -1,3 +1,12 @@
+# 1.0.9
+
+- **New Feature**: Added multi-line support via `maxLines` property.
+- **Improved**: Redesigned cursor rendering for 100% visibility in single and multi-line modes.
+- **Improved**: Keyboard preview now automatically scrolls to the end on open and text change.
+- **Improved**: Added `SelectionArea` to keyboard preview for text interaction.
+- **Fix**: Corrected indicator (icon/cursor) alignment in multi-line fields.
+- **Example**: Added multi-line Bio field and updated layout with `SingleChildScrollView` to prevent screen overflow.
+
 # 1.0.8
 
 - **Fix**: Updated GIF preview link to use absolute URL for better visibility on pub.dev.
